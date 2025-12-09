@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Đường dẫn gốc của dự án (khớp với tên thư mục bạn đặt trong htdocs)
+    RewriteBase /onlinecourse/
+
+    # 1. Nếu request là thư mục thật (!-d) thì bỏ qua, không rewrite
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # 2. Nếu request là file thật (!-f) như ảnh, css, js thì bỏ qua, không rewrite
+    RewriteCond %{REQUEST_FILENAME} !-f
+
+    # 3. Mọi request khác đều chuyển về index.php
+    # Tham số url=$1 sẽ hứng lấy cái đuôi phía sau (ví dụ: courses/detail/1)
+    RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+</IfModule>
