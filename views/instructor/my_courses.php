@@ -1,16 +1,24 @@
 <?php
-// manage.php
+// my_courses.php
 
 session_start();
 require_once '../../config/Database.php';
 require_once '../../models/Course.php';
+require_once '../../models/User.php';
 
 $database = new Database();
 $db = $database->connect();
 
+$user;
 $course = new Course($db);
-$courses = $course->getCoursesByInstructor($_SESSION['user_id']);
 
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
+    header("Location: /onlinecourse/views/auth/login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$courses = $course->getCoursesByInstructor($user_id);
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +26,7 @@ $courses = $course->getCoursesByInstructor($_SESSION['user_id']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Courses</title>
+    <title>My Courses</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,6 +45,9 @@ $courses = $course->getCoursesByInstructor($_SESSION['user_id']);
             padding: 10px 0;
             text-align: center;
         }
+        h1 {
+            margin: 0;
+        }
         table {
             width: 100%;
             margin: 20px 0;
@@ -46,33 +57,35 @@ $courses = $course->getCoursesByInstructor($_SESSION['user_id']);
             border: 1px solid #dddddd;
         }
         th, td {
-            padding: 10px;
+            padding: 8px;
             text-align: left;
         }
         th {
-            background: #35424a;
-            color: #ffffff;
+            background-color: #35424a;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
         .btn {
+            background-color: #35424a;
+            color: white;
             padding: 10px 15px;
-            background: #35424a;
-            color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
         }
         .btn:hover {
-            background: #45a049;
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Manage Your Courses</h1>
+    <h1>My Courses</h1>
 </header>
 
 <div class="container">
-    <h2>Your Courses</h2>
     <table>
         <tr>
             <th>Course Title</th>
@@ -85,8 +98,8 @@ $courses = $course->getCoursesByInstructor($_SESSION['user_id']);
                     <td><?php echo htmlspecialchars($course['title']); ?></td>
                     <td><?php echo htmlspecialchars($course['description']); ?></td>
                     <td>
-                        <a href="edit.php?id=<?php echo $course['id']; ?>" class="btn">Edit</a>
-                        <a href="delete.php?id=<?php echo $course['id']; ?>" class="btn">Delete</a>
+                        <a href="course/edit.php?id=<?php echo $course['id']; ?>" class="btn">Edit</a>
+                        <a href="course/manage.php?id=<?php echo $course['id']; ?>" class="btn">Manage Lessons</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -96,7 +109,6 @@ $courses = $course->getCoursesByInstructor($_SESSION['user_id']);
             </tr>
         <?php endif; ?>
     </table>
-    <a href="create.php" class="btn">Create New Course</a>
 </div>
 
 </body>
